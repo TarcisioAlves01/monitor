@@ -41,8 +41,8 @@ public class AlarmsPage extends ActionsUtil {
 
             if (!colls.isEmpty()) {
                 String alarm = colls.get(2).getText();
-                String device = colls.get(4).getText();
-                String laction = colls.get(5).getText();
+                String laction = colls.get(4).getText();
+                String device = colls.get(5).getText();                
                 String date = colls.get(1).getText();
 
                 Alarm a = new Alarm(alarm, device, laction, date);
@@ -67,7 +67,7 @@ public class AlarmsPage extends ActionsUtil {
         for (WebElement element : elements) {
             try {
                 clikByElement(driver, element, 10);
-                Thread.sleep(200);
+                Thread.sleep(100);
                 List<Alarm> a = getAlarm();
                 alarms.addAll(a);
             } catch (Exception e) {

@@ -10,7 +10,7 @@
     </parent>
     <groupId>br.net.bwm</groupId>
     <artifactId>monitor</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <name>monitor</name>
     <description>Monitor de alarmes na rede</description>
     <properties>
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.5.0</version>
+            <version>4.4.0</version>
         </dependency>
         
         <dependency>

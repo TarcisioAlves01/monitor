@@ -1,6 +1,7 @@
 br/net/bwm/monitor/MonitorApplication.class
 br/net/bwm/monitor/pages/LoginPage.class
 br/net/bwm/monitor/utils/ActionsUtil.class
+br/net/bwm/monitor/model/Rompimento.class
 br/net/bwm/monitor/pages/NotPrivatePage.class
 br/net/bwm/monitor/pages/AlarmsPage.class
 br/net/bwm/monitor/utils/ManagerDriverUtil.class

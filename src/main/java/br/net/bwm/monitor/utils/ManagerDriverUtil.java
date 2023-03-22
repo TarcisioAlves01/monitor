@@ -7,6 +7,7 @@ package br.net.bwm.monitor.utils;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 /**
@@ -20,14 +21,20 @@ public class ManagerDriverUtil {
     public static WebDriver browser(String browser) {
         if (browser.equalsIgnoreCase("chrome")) {
             WebDriverManager.chromedriver().setup();
-            driver = new ChromeDriver();
+            
+            ChromeOptions options = new ChromeOptions();
+            options.setHeadless(true);
+            options.setAcceptInsecureCerts(true);
+            
+            driver = new ChromeDriver(options);
+            
         } else if (browser.equalsIgnoreCase("firefox")) {
-            WebDriverManager.chromedriver().setup();
+            WebDriverManager.firefoxdriver().setup();
             driver = new FirefoxDriver();
         }
-        
+
         driver.manage().window().maximize();
-        
+
         return driver;
     }
 }
