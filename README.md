@@ -12,3 +12,8 @@ Variaveis: HOST_NAME
 Pacote: br.net.bwm.monitor.pages
 CLASS: LoginPage
 Variaveis: LOGIN e PASSWORD;
+
+REQUISITOS:
+--->Java 8
+--->Navegador Google Chrome
+--->Comunicação com a gerencia SNM Plus Padtec
