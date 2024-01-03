@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MonitorApplication {
 
-    private static final String HOST_NAME = "YOUR_HOSTNAME";
+    private static final String HOST_NAME = "YUOR_HOST";
 
     private static WebDriver webDriver;
 
@@ -85,7 +85,7 @@ public class MonitorApplication {
         return ResponseEntity.status(HttpStatus.OK).body(rompimentos);
     }
 
-    @GetMapping("alarm")
+    @GetMapping("alarms")
     public ResponseEntity<List<Alarm>> getAllAlarms() {
         return ResponseEntity.status(HttpStatus.OK).body(alarms);
     }
@@ -93,31 +93,38 @@ public class MonitorApplication {
     private static void run() {
         while (true) {
             try {
-                webDriver = ManagerDriverUtil.browser("chrome");
-                webDriver.get(HOST_NAME + "/login");                
+                webDriver = ManagerDriverUtil.browser();
 
-                //Faz login na página 
-                loginPage = new LoginPage(webDriver);
-                loginPage.login();
+                if (webDriver != null) {
 
-                while (true) {
-                    try {
-                        Thread.sleep(200);
-                        webDriver.get(HOST_NAME + "/alarms");
-                        Thread.sleep(200);
+                    System.out.println("Entrou, não é null!!");
 
-                        //Retorna a lista de alarmes                        
-                        alarmsPage = new AlarmsPage(webDriver);
+                    webDriver.get(HOST_NAME + "/login");
 
-                        alarms = alarmsPage.getAll();
+                    // Faz login na página
+                    loginPage = new LoginPage(webDriver);
+                    loginPage.login();
 
-                    } catch (Exception ex) {
+                    while (true) {
                         try {
-                            webDriver.navigate().refresh();
-                        } catch (Exception e) {
-                            webDriver.close();
-                            System.out.println("Erro: " + e.getMessage());
-                            break;
+                            Thread.sleep(200);
+                            webDriver.get(HOST_NAME + "/alarms");
+                            Thread.sleep(200);
+
+                            // Retorna a lista de alarmes
+                            alarmsPage = new AlarmsPage(webDriver);
+
+                            alarms = alarmsPage.getAll();
+
+                        } catch (Exception ex) {
+                            try {
+                                webDriver.navigate().refresh();
+                            } catch (Exception e) {
+                                webDriver.close();
+                                System.out.println("Erro: " + e.getMessage());
+                                break;
+                            }
+
                         }
 
                     }
@@ -127,7 +134,9 @@ public class MonitorApplication {
             } catch (Exception e) {
                 System.out.println("Erro: " + e.getMessage());
             } finally {
-                webDriver.quit();
+                if (webDriver != null) {
+                    webDriver.close();
+                }
             }
 
         }

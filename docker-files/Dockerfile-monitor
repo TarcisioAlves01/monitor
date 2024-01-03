@@ -1,0 +1,5 @@
+FROM openjdk:17-alpine
+
+COPY ../target/monitor-1.0.jar monitor.jar
+
+ENTRYPOINT ["java","-jar","monitor.jar"]

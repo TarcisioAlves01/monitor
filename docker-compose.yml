@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+
+  monitor:
+    build:
+      context: .
+      dockerfile: docker-files/Dockerfile-monitor
+    container_name: app-monitor
+    networks:
+      - network_easy
+    depends_on:
+      - selenium
+    tty: true
+    restart: always
+    expose:
+      - "8080"
+  selenium:
+    build:
+      context: .
+      dockerfile: docker-files/Dockerfile-selenium
+    container_name: selenium
+    networks:
+      - network_easy
+    tty: true
+    restart: always
+    expose:
+      - "4444"
+
+networks:
+  network_easy:
+    driver: bridge
+
+volumes:
+  data-volume:
+    driver: local

@@ -5,10 +5,12 @@
 package br.net.bwm.monitor.utils;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+
+import java.net.URL;
+
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 /**
  *
@@ -16,25 +18,28 @@ import org.openqa.selenium.firefox.FirefoxDriver;
  */
 public class ManagerDriverUtil {
 
+    private static String URL_DRIVER = "http://selenium:4444/wd/hub";
+
     private static WebDriver driver;
 
-    public static WebDriver browser(String browser) {
-        if (browser.equalsIgnoreCase("chrome")) {
-            WebDriverManager.chromedriver().setup();
-            
-            ChromeOptions options = new ChromeOptions();
-            options.setHeadless(true);
-            options.setAcceptInsecureCerts(true);
-            
-            driver = new ChromeDriver(options);
-            
-        } else if (browser.equalsIgnoreCase("firefox")) {
-            WebDriverManager.firefoxdriver().setup();
-            driver = new FirefoxDriver();
-        }
+    public static WebDriver browser() throws Exception {
+
+        WebDriverManager.chromedriver().setup();
+
+        ChromeOptions options = new ChromeOptions();
+        options.setHeadless(true);
+        options.setAcceptInsecureCerts(true);
+
+        driver = new RemoteWebDriver(new URL(URL_DRIVER), options);
 
         driver.manage().window().maximize();
 
         return driver;
+    }
+
+    public static void closeBrowser() {
+        if (driver != null) {
+            driver.quit();
+        }
     }
 }
