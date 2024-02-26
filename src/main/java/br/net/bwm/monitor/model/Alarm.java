@@ -4,21 +4,25 @@ import java.util.Objects;
 
 public class Alarm {
 
+    private String criticality;
     private String alarm;
     private String device;
     private String laction;
     private String date;
 
-    public Alarm(String alarm, String device, String laction, String date) {
+    public Alarm(String alarm, String device, String criticality, String laction, String date) {
+
         this.alarm = alarm;
         this.device = device;
         this.laction = laction;
         this.date = date;
+        this.criticality = criticality;
     }
 
     @Override
     public String toString() {
-        return "Alarm{" + "alarm=" + alarm + ", device=" + device + ", laction=" + laction + ", date=" + date + '}';
+        return "Alarm [criticality=" + criticality + ", alarm=" + alarm + ", device=" + device + ", laction=" + laction
+                + ", date=" + date + "]";
     }
 
     @Override
@@ -85,6 +89,14 @@ public class Alarm {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getCriticality() {
+        return criticality;
+    }
+
+    public void setCriticality(String criticality) {
+        this.criticality = criticality;
     }
 
 }

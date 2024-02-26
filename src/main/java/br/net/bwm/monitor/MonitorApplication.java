@@ -7,6 +7,8 @@ import br.net.bwm.monitor.pages.LoginPage;
 import br.net.bwm.monitor.utils.ManagerDriverUtil;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.WebDriver;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MonitorApplication {
 
-    private static final String HOST_NAME = "YUOR_HOST";
+    private static final String HOST_NAME = "https://172.16.227.10";
 
     private static WebDriver webDriver;
 
@@ -60,10 +62,11 @@ public class MonitorApplication {
                 int down = a.indexOf("DOWN");
                 int port8 = a.indexOf("PORTA 8");
                 int port9 = a.indexOf("PORTA 9");
+                int payload = a.indexOf("LOS Payload");
 
-                if ((los != -1) || (down != -1) || (port8 != -1) || (port9 != -1)) {
+                if (indexDevice != -1) {
 
-                    if (indexDevice != -1) {
+                    if ((los != -1) || (down != -1) || (port8 != -1) || (port9 != -1) || (payload != -1)) {
 
                         Rompimento rompimento = new Rompimento();
 
@@ -96,12 +99,7 @@ public class MonitorApplication {
                 webDriver = ManagerDriverUtil.browser();
 
                 if (webDriver != null) {
-
-                    System.out.println("Entrou, não é null!!");
-
                     webDriver.get(HOST_NAME + "/login");
-
-                    // Faz login na página
                     loginPage = new LoginPage(webDriver);
                     loginPage.login();
 
@@ -110,36 +108,35 @@ public class MonitorApplication {
                             Thread.sleep(200);
                             webDriver.get(HOST_NAME + "/alarms");
                             Thread.sleep(200);
-
-                            // Retorna a lista de alarmes
                             alarmsPage = new AlarmsPage(webDriver);
-
                             alarms = alarmsPage.getAll();
-
+                        } catch (NoSuchSessionException e) {
+                            recreateWebDriver();
                         } catch (Exception ex) {
-                            try {
-                                webDriver.navigate().refresh();
-                            } catch (Exception e) {
-                                webDriver.close();
-                                System.out.println("Erro: " + e.getMessage());
-                                break;
-                            }
-
+                            handleException(ex);
                         }
-
                     }
-
                 }
-
             } catch (Exception e) {
-                System.out.println("Erro: " + e.getMessage());
+                handleException(e);
             } finally {
                 if (webDriver != null) {
-                    webDriver.close();
+                    webDriver.quit(); // Close WebDriver session gracefully
                 }
             }
-
         }
+    }
+
+    private static void recreateWebDriver() throws Exception {
+        if (webDriver != null) {
+            webDriver.quit(); // Quit existing WebDriver session
+        }
+        webDriver = ManagerDriverUtil.browser(); // Recreate WebDriver session
+    }
+
+    private static void handleException(Exception ex) {
+        System.out.println("Error occurred: " + ex.getMessage());
+        ex.printStackTrace();
     }
 
 }

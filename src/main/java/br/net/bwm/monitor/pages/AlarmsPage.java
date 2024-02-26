@@ -7,6 +7,7 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
 /**
  *
  * @author tarcisio
@@ -32,12 +33,14 @@ public class AlarmsPage extends ActionsUtil {
             List<WebElement> colls = line.findElements(By.cssSelector("td"));
 
             if (!colls.isEmpty()) {
-                String alarm = colls.get(2).getText();
-                String laction = colls.get(4).getText();
-                String device = colls.get(5).getText();                
-                String date = colls.get(1).getText();
 
-                Alarm a = new Alarm(alarm, device, laction, date);
+                String date = colls.get(1).getText();
+                String alarm = colls.get(2).getText();
+                String criticality = colls.get(3).getText();
+                String laction = colls.get(4).getText();
+                String device = colls.get(5).getText();
+
+                Alarm a = new Alarm(alarm, device, criticality, laction, date);
                 alarms.add(a);
 
             }
@@ -53,8 +56,9 @@ public class AlarmsPage extends ActionsUtil {
         List<Alarm> firstPage = getAlarm();
         alarms.addAll(firstPage);
 
-        //Find alarm by step page in table
-        List<WebElement> elements = driver.findElements(By.xpath("//button[@class='p-paginator-page p-paginator-element p-link']"));
+        // Find alarm by step page in table
+        List<WebElement> elements = driver
+                .findElements(By.xpath("//button[@class='p-paginator-page p-paginator-element p-link']"));
 
         for (WebElement element : elements) {
             try {
