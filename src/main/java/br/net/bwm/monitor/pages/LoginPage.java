@@ -10,8 +10,8 @@ import org.openqa.selenium.WebDriver;
  */
 public class LoginPage extends ActionsUtil {
 
-    private static final String LOGIN = "Monitor.BWM";
-    private static final String PASSWORD = "Khsjdb7GAgsFFFahs@gsak";
+    private static final String LOGIN = "YUOR USERNAME";
+    private static final String PASSWORD = "YUOR PASSWORD";
 
     private WebDriver driver;
 

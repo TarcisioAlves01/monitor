@@ -5,11 +5,16 @@ import br.net.bwm.monitor.model.Rompimento;
 import br.net.bwm.monitor.pages.AlarmsPage;
 import br.net.bwm.monitor.pages.LoginPage;
 import br.net.bwm.monitor.utils.ManagerDriverUtil;
+
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
@@ -46,7 +51,6 @@ public class MonitorApplication {
         List<String> devices = new ArrayList<>();
         devices.add("SCMD");
         devices.add("SPVL");
-        devices.add("LOA");
         devices.add("SCME");
 
         List<Rompimento> rompimentos = new ArrayList<>();
@@ -96,47 +100,98 @@ public class MonitorApplication {
     private static void run() {
         while (true) {
             try {
-                webDriver = ManagerDriverUtil.browser();
+                setupWebDriver();
+                performLogin();
 
-                if (webDriver != null) {
-                    webDriver.get(HOST_NAME + "/login");
-                    loginPage = new LoginPage(webDriver);
-                    loginPage.login();
-
-                    while (true) {
-                        try {
-                            Thread.sleep(200);
-                            webDriver.get(HOST_NAME + "/alarms");
-                            Thread.sleep(200);
-                            alarmsPage = new AlarmsPage(webDriver);
-                            alarms = alarmsPage.getAll();
-                        } catch (NoSuchSessionException e) {
-                            recreateWebDriver();
-                        } catch (Exception ex) {
-                            handleException(ex);
-                        }
+                // Monitoramento contínuo dos alarmes
+                while (true) {
+                    try {
+                        fetchAndProcessAlarms();
+                        Thread.sleep(5000); // Intervalo entre atualizações
+                    } catch (NoSuchSessionException e) {
+                        handleException(e);
+                        recreateWebDriver(); // Recria o WebDriver e tenta novamente
+                        performLogin(); // Refaça o login após recriar o WebDriver
+                    } catch (Exception e) {
+                        handleException(e);
+                        recreateWebDriver(); // Recria o WebDriver em caso de erro
+                        performLogin(); // Refaça o login após recriar o WebDriver
                     }
                 }
             } catch (Exception e) {
                 handleException(e);
+                // Não há necessidade de chamar recreateWebDriver() aqui,
+                // pois o WebDriver já está sendo recriado na seção interna
             } finally {
+                // Garantir que o WebDriver seja encerrado no final do ciclo, se necessário
                 if (webDriver != null) {
-                    webDriver.quit(); // Close WebDriver session gracefully
+                    webDriver.quit(); // Fecha a sessão do WebDriver
                 }
             }
         }
     }
 
-    private static void recreateWebDriver() throws Exception {
-        if (webDriver != null) {
-            webDriver.quit(); // Quit existing WebDriver session
+    private static void setupWebDriver() {
+        try {
+            if (webDriver != null) {
+                webDriver.quit(); // Certifique-se de encerrar uma sessão existente
+            }
+            webDriver = ManagerDriverUtil.browser();
+            if (webDriver == null) {
+                throw new RuntimeException("Falha ao inicializar o WebDriver.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao inicializar o WebDriver.", e);
         }
-        webDriver = ManagerDriverUtil.browser(); // Recreate WebDriver session
+    }
+
+    private static void performLogin() {
+        try {
+            webDriver.get(HOST_NAME + "/login");
+
+            WebDriverWait waitLogin = new WebDriverWait(webDriver, Duration.ofMinutes(1));
+            By inputUserName = By.xpath("//input[@id='username']");
+            waitLogin.until(ExpectedConditions.visibilityOfElementLocated(inputUserName));
+
+            loginPage = new LoginPage(webDriver);
+            loginPage.login();
+
+        } catch (Exception e) {
+            handleException(e);
+            throw new RuntimeException("Erro durante o login.", e);
+        }
+    }
+
+    private static void fetchAndProcessAlarms() throws Exception {
+        
+        webDriver.get(HOST_NAME + "/alarms");
+
+        WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
+        By datatable = By.xpath("//tbody[@class='p-datatable-tbody']");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(datatable));
+
+        alarmsPage = new AlarmsPage(webDriver);
+        alarms = alarmsPage.getAll();
+    }
+
+    private static void recreateWebDriver() {
+        try {
+            if (webDriver != null) {
+                webDriver.quit(); // Encerra o WebDriver atual
+            }
+            setupWebDriver(); // Recria uma nova instância do WebDriver
+        } catch (Exception e) {
+            handleException(e);
+            // Pode ser necessário adicionar um loop de espera ou uma pausa aqui
+            // para evitar a tentativa de recriação contínua em caso de falha repetida
+        }
     }
 
     private static void handleException(Exception ex) {
-        System.out.println("Error occurred: " + ex.getMessage());
+        System.err.println("Ocorreu um erro: " + ex.getMessage());
         ex.printStackTrace();
+        // Considerar uma pausa ou estratégia de retry para prevenir loops rápidos
+        // contínuos
     }
 
 }
