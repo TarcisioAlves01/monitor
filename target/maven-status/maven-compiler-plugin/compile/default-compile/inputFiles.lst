@@ -1,7 +1,6 @@
 /home/tarcisio/Desenvolvimento/monitor/src/main/java/br/net/bwm/monitor/utils/ManagerDriverUtil.java
 /home/tarcisio/Desenvolvimento/monitor/src/main/java/br/net/bwm/monitor/MonitorApplication.java
 /home/tarcisio/Desenvolvimento/monitor/src/main/java/br/net/bwm/monitor/pages/AlarmsPage.java
-/home/tarcisio/Desenvolvimento/monitor/src/main/java/br/net/bwm/monitor/model/Rompimento.java
 /home/tarcisio/Desenvolvimento/monitor/src/main/java/br/net/bwm/monitor/pages/LoginPage.java
 /home/tarcisio/Desenvolvimento/monitor/src/main/java/br/net/bwm/monitor/model/Alarm.java
 /home/tarcisio/Desenvolvimento/monitor/src/main/java/br/net/bwm/monitor/utils/ActionsUtil.java

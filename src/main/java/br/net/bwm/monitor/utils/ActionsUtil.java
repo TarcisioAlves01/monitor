@@ -4,6 +4,8 @@
  */
 package br.net.bwm.monitor.utils;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -17,13 +19,18 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  */
 public class ActionsUtil {
 
+    public static final Path path = Paths.get("/home/seluser/Downloads");
+    // public static final Path path = Paths.get("/home/tarcisio/Downloads/files");
+
     public static void click(WebDriver driver, By by, int sleep) {
-        WebElement element = (new WebDriverWait(driver, Duration.ofSeconds(sleep)).until(ExpectedConditions.elementToBeClickable(by)));
+        WebElement element = (new WebDriverWait(driver, Duration.ofSeconds(sleep))
+                .until(ExpectedConditions.elementToBeClickable(by)));
         element.click();
     }
 
-    public static void clikByElement(WebDriver driver, WebElement element, int sleep) {
-        WebElement e = (new WebDriverWait(driver, Duration.ofSeconds(sleep)).until(ExpectedConditions.elementToBeClickable(element)));
+    public static void clickByElement(WebDriver driver, WebElement element, int sleep) {
+        WebElement e = (new WebDriverWait(driver, Duration.ofSeconds(sleep))
+                .until(ExpectedConditions.elementToBeClickable(element)));
         e.click();
     }
 
@@ -36,4 +43,5 @@ public class ActionsUtil {
 
         return element;
     }
+
 }

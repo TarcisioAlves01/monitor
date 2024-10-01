@@ -10,8 +10,8 @@ import org.openqa.selenium.WebDriver;
  */
 public class LoginPage extends ActionsUtil {
 
-    private static final String LOGIN = "YUOR USERNAME";
-    private static final String PASSWORD = "YUOR PASSWORD";
+    private static final String LOGIN = "YOUR LOGIN";
+    private static final String PASSWORD = "YOUR PASSWORD";
 
     private WebDriver driver;
 

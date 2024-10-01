@@ -8,21 +8,19 @@ public class Alarm {
     private String alarm;
     private String device;
     private String laction;
-    private String date;
 
-    public Alarm(String alarm, String device, String criticality, String laction, String date) {
+    public Alarm(String alarm, String device, String criticality, String laction) {
 
         this.alarm = alarm;
         this.device = device;
         this.laction = laction;
-        this.date = date;
         this.criticality = criticality;
     }
 
     @Override
     public String toString() {
         return "Alarm [criticality=" + criticality + ", alarm=" + alarm + ", device=" + device + ", laction=" + laction
-                + ", date=" + date + "]";
+                + "]";
     }
 
     @Override
@@ -31,7 +29,6 @@ public class Alarm {
         hash = 67 * hash + Objects.hashCode(this.alarm);
         hash = 67 * hash + Objects.hashCode(this.device);
         hash = 67 * hash + Objects.hashCode(this.laction);
-        hash = 67 * hash + Objects.hashCode(this.date);
         return hash;
     }
 
@@ -53,10 +50,8 @@ public class Alarm {
         if (!Objects.equals(this.device, other.device)) {
             return false;
         }
-        if (!Objects.equals(this.laction, other.laction)) {
-            return false;
-        }
-        return Objects.equals(this.date, other.date);
+      
+        return Objects.equals(this.laction, other.laction);
     }
 
     public String getAlarm() {
@@ -81,15 +76,7 @@ public class Alarm {
 
     public void setLaction(String laction) {
         this.laction = laction;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
+    } 
 
     public String getCriticality() {
         return criticality;

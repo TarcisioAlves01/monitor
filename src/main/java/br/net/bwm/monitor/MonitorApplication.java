@@ -1,7 +1,6 @@
 package br.net.bwm.monitor;
 
 import br.net.bwm.monitor.model.Alarm;
-import br.net.bwm.monitor.model.Rompimento;
 import br.net.bwm.monitor.pages.AlarmsPage;
 import br.net.bwm.monitor.pages.LoginPage;
 import br.net.bwm.monitor.utils.ManagerDriverUtil;
@@ -12,6 +11,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchSessionException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MonitorApplication {
 
-    private static final String HOST_NAME = "https://172.16.227.10";
+    private static final String HOST_NAME = "YOUR ADDRESS SERVER";
 
     private static WebDriver webDriver;
 
@@ -46,41 +46,31 @@ public class MonitorApplication {
     }
 
     @GetMapping("rompimento")
-    public ResponseEntity<List<Rompimento>> getFail() {
+    public ResponseEntity<List<String>> getFail() {
 
         List<String> devices = new ArrayList<>();
-        devices.add("SCMD");
-        devices.add("SPVL");
         devices.add("SCME");
-
-        List<Rompimento> rompimentos = new ArrayList<>();
+        devices.add("SPVL");
+        List<String> rompimentos = new ArrayList<>();
 
         for (Alarm alarm : alarms) {
 
-            for (String device : devices) {
+            int scme = alarm.getDevice().toUpperCase().indexOf("SCME");
+            int spvl = alarm.getDevice().toUpperCase().indexOf("SPVL");
 
-                int indexDevice = alarm.getDevice().toUpperCase().indexOf(device);
+            if (scme != -1 || spvl != -1) {
 
                 String a = alarm.getAlarm().toUpperCase();
+
                 int los = a.indexOf("LOS");
                 int down = a.indexOf("DOWN");
-                int port8 = a.indexOf("PORTA 8");
-                int port9 = a.indexOf("PORTA 9");
-                int payload = a.indexOf("LOS Payload");
+                int port = a.indexOf("PORTA");
+                int sfp = a.indexOf("SFP");
 
-                if (indexDevice != -1) {
+                if ((los != -1) || (down != -1) || (port != -1) || (sfp != -1)) {
 
-                    if ((los != -1) || (down != -1) || (port8 != -1) || (port9 != -1) || (payload != -1)) {
-
-                        Rompimento rompimento = new Rompimento();
-
-                        rompimento.setLocation(alarm.getLaction());
-                        rompimento.setDate(alarm.getDate());
-
-                        if (!rompimentos.contains(rompimento)) {
-                            rompimentos.add(rompimento);
-                        }
-
+                    if (!rompimentos.contains(alarm.getLaction())) {
+                        rompimentos.add(alarm.getLaction());
                     }
 
                 }
@@ -100,7 +90,9 @@ public class MonitorApplication {
     private static void run() {
         while (true) {
             try {
+
                 setupWebDriver();
+
                 performLogin();
 
                 // Monitoramento contínuo dos alarmes
@@ -118,12 +110,12 @@ public class MonitorApplication {
                         performLogin(); // Refaça o login após recriar o WebDriver
                     }
                 }
+
             } catch (Exception e) {
+
                 handleException(e);
-                // Não há necessidade de chamar recreateWebDriver() aqui,
-                // pois o WebDriver já está sendo recriado na seção interna
             } finally {
-                // Garantir que o WebDriver seja encerrado no final do ciclo, se necessário
+
                 if (webDriver != null) {
                     webDriver.quit(); // Fecha a sessão do WebDriver
                 }
@@ -147,15 +139,25 @@ public class MonitorApplication {
 
     private static void performLogin() {
         try {
+            // Acessa a página de login
             webDriver.get(HOST_NAME + "/login");
 
-            WebDriverWait waitLogin = new WebDriverWait(webDriver, Duration.ofMinutes(1));
+            // Aguarda até que a URL contenha a parte esperada
+            WebDriverWait waitLogin = new WebDriverWait(webDriver, Duration.ofMinutes(2)); // Ajuste conforme
+                                                                                           // necessário
+            waitLogin.until(ExpectedConditions.urlContains("/login"));
+
+            // Localiza o campo de usuário
             By inputUserName = By.xpath("//input[@id='username']");
             waitLogin.until(ExpectedConditions.visibilityOfElementLocated(inputUserName));
 
+            // Inicializa a página de login e realiza o login
             loginPage = new LoginPage(webDriver);
             loginPage.login();
 
+        } catch (TimeoutException e) {
+            System.err.println("Timeout ao tentar acessar o campo de username: " + e.getMessage());
+            throw new RuntimeException("Erro durante o login: campo de username não encontrado.", e);
         } catch (Exception e) {
             handleException(e);
             throw new RuntimeException("Erro durante o login.", e);
@@ -163,15 +165,19 @@ public class MonitorApplication {
     }
 
     private static void fetchAndProcessAlarms() throws Exception {
-        
+
         webDriver.get(HOST_NAME + "/alarms");
 
         WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
-        By datatable = By.xpath("//tbody[@class='p-datatable-tbody']");
+
+        By datatable = By.xpath("//table[@class='p-datatable-table']");
+
         wait.until(ExpectedConditions.visibilityOfElementLocated(datatable));
 
         alarmsPage = new AlarmsPage(webDriver);
+
         alarms = alarmsPage.getAll();
+
     }
 
     private static void recreateWebDriver() {
@@ -182,8 +188,6 @@ public class MonitorApplication {
             setupWebDriver(); // Recria uma nova instância do WebDriver
         } catch (Exception e) {
             handleException(e);
-            // Pode ser necessário adicionar um loop de espera ou uma pausa aqui
-            // para evitar a tentativa de recriação contínua em caso de falha repetida
         }
     }
 
