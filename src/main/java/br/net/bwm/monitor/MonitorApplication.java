@@ -1,10 +1,5 @@
 package br.net.bwm.monitor;
 
-import br.net.bwm.monitor.model.Alarm;
-import br.net.bwm.monitor.pages.AlarmsPage;
-import br.net.bwm.monitor.pages.LoginPage;
-import br.net.bwm.monitor.utils.ManagerDriverUtil;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +17,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.net.bwm.monitor.model.Alarm;
+import br.net.bwm.monitor.pages.AlarmsPage;
+import br.net.bwm.monitor.pages.LoginPage;
+import br.net.bwm.monitor.utils.ManagerDriverUtil;
+
 @SpringBootApplication
 @RestController
 public class MonitorApplication {
 
-    private static final String HOST_NAME = "YOUR ADDRESS SERVER";
+    private static final String HOST_NAME = "YOUR_HOST";
 
     private static WebDriver webDriver;
 
@@ -48,15 +48,14 @@ public class MonitorApplication {
     @GetMapping("rompimento")
     public ResponseEntity<List<String>> getFail() {
 
-        List<String> devices = new ArrayList<>();
-        devices.add("SCME");
-        devices.add("SPVL");
+       
         List<String> rompimentos = new ArrayList<>();
 
         for (Alarm alarm : alarms) {
 
             int scme = alarm.getDevice().toUpperCase().indexOf("SCME");
             int spvl = alarm.getDevice().toUpperCase().indexOf("SPVL");
+            //int scmd = alarm.getDevice().toUpperCase().indexOf("SCMD");
 
             if (scme != -1 || spvl != -1) {
 
@@ -176,7 +175,11 @@ public class MonitorApplication {
 
         alarmsPage = new AlarmsPage(webDriver);
 
-        alarms = alarmsPage.getAll();
+        List<Alarm> list = alarmsPage.getAll();
+
+        if (!list.isEmpty()) {
+            alarms = list;
+        }
 
     }
 

@@ -1,8 +1,9 @@
 package br.net.bwm.monitor.pages;
 
-import br.net.bwm.monitor.utils.ActionsUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+
+import br.net.bwm.monitor.utils.ActionsUtil;
 
 /**
  *
@@ -10,8 +11,8 @@ import org.openqa.selenium.WebDriver;
  */
 public class LoginPage extends ActionsUtil {
 
-    private static final String LOGIN = "YOUR LOGIN";
-    private static final String PASSWORD = "YOUR PASSWORD";
+    private static final String LOGIN = "YOUR_LOGIN";
+    private static final String PASSWORD = "YOUR_PASSWORD";
 
     private WebDriver driver;
 
